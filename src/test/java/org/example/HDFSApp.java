@@ -43,7 +43,7 @@ public class HDFSApp {
 
     @Test
     public void text() throws IOException {
-        FSDataInputStream in = fileSystem.open(new Path("/testLua.lua"));
+        FSDataInputStream in = fileSystem.open(new Path("/test.rb"));
         IOUtils.copyBytes(in, System.out, 1024);
     }
 
@@ -70,7 +70,7 @@ public class HDFSApp {
 
     @Test
     public void copyFromLocalFile() throws Exception {
-        Path src = new Path("/Users/leijinhuan/Documents/Code/CS519/DecisionTree/hw01/input_files/properties.txt");
+        Path src = new Path("/Users/jlei/Desktop/test.rb");
         Path dst = new Path("/hdfsapi/test/");
         fileSystem.copyFromLocalFile(src, dst);
     }
@@ -78,8 +78,8 @@ public class HDFSApp {
     // with large file, add a loading bar
     @Test
     public void copyFromLocalLargeFile() throws Exception {
-        InputStream in = new BufferedInputStream(new FileInputStream(new File("/Users/leijinhuan/Documents/PDF/机器学习_周志华.pdf")));
-        FSDataOutputStream out = fileSystem.create(new Path("/hdfsapi/test/test.pdf"), new Progressable() {
+        InputStream in = new BufferedInputStream(new FileInputStream(new File("/Users/jlei/Documents/Hadoop/hadoop-2.6.0-cdh5.15.1.tar.gz")));
+        FSDataOutputStream out = fileSystem.create(new Path("/hdfsapi/test/bigFile.tar.gz"), new Progressable() {
             public void progress() {
                 System.out.print(".");
             }
