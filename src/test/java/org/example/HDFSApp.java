@@ -1,10 +1,7 @@
 package org.example;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.util.Progressable;
 import org.junit.After;
@@ -87,5 +84,61 @@ public class HDFSApp {
         IOUtils.copyBytes(in, out, 4096);
     }
 
+    @Test
+    public void copyToLocalFile() throws Exception {
+        Path src = new Path("/hdfsapi/test/c.txt");
+        Path dst = new Path("/Users/jlei/Documents/Hadoop/");
+        fileSystem.copyToLocalFile(src, dst);
+    }
+
+    @Test
+    public void listFilesStatus() throws Exception {
+        Path dst = new Path("/hdfsapi/test/");
+        FileStatus[] fileStatuses = fileSystem.listStatus(dst);
+        for (FileStatus file : fileStatuses) {
+            String isDir = file.isDirectory() ? "Folder" : "File";
+            String permission = file.getPermission().toString();
+            short replication = file.getReplication();
+            long length = file.getLen();
+            String path = file.getPath().toString();
+
+            System.out.println(isDir + "\t" + permission + "\t" + replication + "\t" + length + "\t"
+                    + path);
+        }
+    }
+
+    @Test
+    public void listFilesRecursive() throws Exception {
+        Path dst = new Path("/");
+        RemoteIterator<LocatedFileStatus> iter = fileSystem.listFiles(dst, true);
+        while (iter.hasNext()) {
+            LocatedFileStatus file = iter.next();
+            String isDir = file.isDirectory() ? "Folder" : "File";
+            String permission = file.getPermission().toString();
+            short replication = file.getReplication();
+            long length = file.getLen();
+            String path = file.getPath().toString();
+
+            System.out.println(isDir + "\t" + permission + "\t" + replication + "\t" + length + "\t"
+                    + path);
+        }
+    }
+
+    @Test
+    public void getFileBlockLocations() throws Exception {
+        FileStatus fileStatus = fileSystem.getFileStatus(new Path("/hdfsapi/test/bigFile.tar.gz"));
+        BlockLocation[] blocks = fileSystem.getFileBlockLocations(fileStatus, 0, fileStatus.getLen());
+        for (BlockLocation block : blocks) {
+            for (String name : block.getNames()) {
+                System.out.println(name + " : " + block.getOffset() + " : " + block.getLength());
+            }
+        }
+    }
+
+    @Test
+    public void delete() throws IOException {
+        boolean result = fileSystem.delete(new Path("/hdfsapi/test/bigFile.tar.gz"));
+        System.out.println(result);
+    }
 
 }
