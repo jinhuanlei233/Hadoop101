@@ -6,12 +6,14 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.Map;
+import java.util.Properties;
 
 // Word Counter in HDFS, output the result to the HDFS
-public class HDFSWordCounter {
+public class HDFSWordCounterPlus {
     public static void main(String[] args) throws Exception {
-        Path input = new Path("/hdfsapi/test/hello.txt");
-        FileSystem fileSystem = FileSystem.get(new URI("hdfs://localhost:9000"), new Configuration());
+        Properties properties = ParamsUtils.getProperties();
+        Path input = new Path(properties.getProperty(Constants.INPUT_PATH));
+        FileSystem fileSystem = FileSystem.get(new URI(properties.getProperty(Constants.HDFS_URL)), new Configuration());
 
         Context context = new Context();
         Map<Object, Object> hm = context.getCacheMap();
@@ -30,8 +32,8 @@ public class HDFSWordCounter {
             in.close();
         }
 
-        Path output = new Path("/hdfsapi/output/");
-        FSDataOutputStream out = fileSystem.create(new Path(output, new Path("wc.out")));
+        Path output = new Path(properties.getProperty(Constants.OUTPUT_PATH));
+        FSDataOutputStream out = fileSystem.create(new Path(output, new Path(properties.getProperty(Constants.OUTPUT_FILE))));
 
         for (Map.Entry<Object, Object> entry : hm.entrySet()) {
             out.write((entry.getKey().toString() + " \t " + entry.getValue() + "\n").getBytes());
