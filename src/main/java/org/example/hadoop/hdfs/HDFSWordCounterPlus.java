@@ -2,6 +2,7 @@ package org.example.hadoop.hdfs;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -17,7 +18,10 @@ public class HDFSWordCounterPlus {
 
         Context context = new Context();
         Map<Object, Object> hm = context.getCacheMap();
-        Mapper mapper = new WordCountMapper();
+
+        Class<?> clazz = Class.forName(properties.getProperty(Constants.MAPPER_CLASS));
+        Mapper mapper = (Mapper) clazz.newInstance();
+//        Mapper mapper = new WordCountMapper();
         RemoteIterator<LocatedFileStatus> iter = fileSystem.listFiles(input, false);
         while (iter.hasNext()) {
             LocatedFileStatus file = iter.next();
